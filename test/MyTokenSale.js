@@ -41,11 +41,11 @@ contract('MyTokenSale', (accounts) => {
 		const amount = await tokenSaleInstance.tokenSold();
 		assert.equal(amount.toNumber(), numberOfTokens, 'increments the number of tokens sold');
 
-    const buyerBalance = await tokenInstance.balanceOf(buyer)
-    assert.equal(buyerBalance.toNumber(), numberOfTokens)
+		const buyerBalance = await tokenInstance.balanceOf(buyer);
+		assert.equal(buyerBalance.toNumber(), numberOfTokens);
 
-    const balance = await tokenInstance.balanceOf(tokenSaleInstance.address)
-    assert.equal(balance.toNumber(), tokensAvailable - numberOfTokens)
+		const balance = await tokenInstance.balanceOf(tokenSaleInstance.address);
+		assert.equal(balance.toNumber(), tokensAvailable - numberOfTokens);
 
 		try {
 			await tokenSaleInstance.buyTokens(numberOfTokens, { from: buyer, value: 1 });
@@ -58,5 +58,28 @@ contract('MyTokenSale', (accounts) => {
 		} catch (error) {
 			assert(error.message.indexOf('revert') !== -1, 'cannot purchase more tokens than available');
 		}
+	});
+
+	it('ends token sale', async () => {
+		tokenInstance = await MyToken.deployed();
+		tokenSaleInstance = await MyTokenSale.deployed();
+
+		try {
+			await tokenSaleInstance.endSale({ from: buyer });
+		} catch (error) {
+			assert(error.message.indexOf('revert') !== -1, 'must be admin to end sale');
+		}
+
+		try {
+			await tokenSaleInstance.endSale({ from: admin });
+		} catch (error) {
+			assert(error.message.indexOf('revert') !== -1);
+		}
+
+		let balance = await tokenInstance.balanceOf(admin);
+		assert.equal(balance.toNumber(), 999990, 'returns all unsold tokens to admin');
+
+		balance = await web3.eth.getBalance(tokenSaleInstance.address);
+		assert.equal(balance, 0);
 	});
 });

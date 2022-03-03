@@ -97,7 +97,7 @@ contract('MyToken', (accounts) => {
         assert.equal(receipt.logs.length, 1, 'triggers one event');
         assert.equal(receipt.logs[0].event, 'Transfer', 'should be the Transfer event');
         assert.equal(receipt.logs[0].args._from, fromAccount, 'logs the account the tokens are transferred by');
-        assert.equal(receipt.logs[0].args._to, toAccount, '100 the account the tokens are transferred to');
+        assert.equal(receipt.logs[0].args._to, toAccount, 'logs the account the tokens are transferred to');
         assert.equal(receipt.logs[0].args._value, 10, 'logs the transfer amount');
 
         const fromBalance = await instance.balanceOf(fromAccount);
